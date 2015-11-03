@@ -73,7 +73,7 @@
             	<div class="col-md-12">
             		<table class="table table-striped">
             			<thead>
-            			<tr>
+            			<tr >
             				<th>#</th>
             				<th>Fecha</th>
             				<th>F</th>
@@ -84,7 +84,6 @@
             				<th>Importe</th>
             				<th>Iva</th>
             				<th>Total</th>
-            				<th>Actions</th>
             			</tr>
             			</thead>
             			<tbody>
@@ -97,19 +96,19 @@ if (($fichero = fopen("facturas.csv", "r")) !== FALSE) {
         	
         	$iva = 0.16 * floatval(str_replace($rep, "", $datos[7]));
         	$totl = $iva + floatval(str_replace($rep, "", $datos[7]));
-        	echo "<tr>";
-			echo "<td>".$i++."</td>";
+        	echo "<tr class='myTable'>";
+			echo "<td>".$i."</td>";
 			echo "<td>".$datos[1]."</td>";
 			echo "<td>".$datos[2]."</td>";
 			echo "<td>".$datos[3]."</td>";
 			echo "<td>".$datos[4]."</td>";
-			echo "<td>".$datos[5]."</td>"; //Concepto
-			echo "<td>".$datos[6]."</td>"; //precio U
-			echo "<td>".$datos[7]."</td>"; //importe
-			echo "<td>$".number_format($iva,2)."</td>"; //iva
-			echo "<td>$".number_format($totl,2)."</td>"; //total
-			echo "<td>"?><button class="btn btn-danger"><i class="fa fa-print"></i></button> <?php echo "</td>";
+			echo "<td>".str_replace("$"," ",$datos[5])."</td>"; //Concepto
+			echo "<td>".str_replace(",","",$datos[6])."</td>"; //precio U
+			echo "<td>".str_replace(",","",$datos[7])."</td>"; //importe
+			echo "<td>$".$iva."</td>"; //iva
+			echo "<td>$".$totl."</td>"; //total
 			echo "</tr>";
+			$i++;
         }
     }
 }
@@ -121,6 +120,27 @@ if (($fichero = fopen("facturas.csv", "r")) !== FALSE) {
            
         </div>
     </div>
+    <!-- Modal -->
+<div class="modal fade" id="modalPdf" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" style="width: 80%;height: 100%" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+      </div>
+      <div class="modal-body">
+      	<div class="row">
+      		<div class="col-md-12">
+        <iframe src="formato.php" style="width: 100%;height: 100%"></iframe>
+        </div>
+      	</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
     <!-- CONTENT-WRAPPER SECTION END-->
     <footer>
         <div class="container">
@@ -138,5 +158,13 @@ if (($fichero = fopen("facturas.csv", "r")) !== FALSE) {
     <script src="assets/js/jquery-1.11.1.js"></script>
     <!-- BOOTSTRAP SCRIPTS  -->
     <script src="assets/js/bootstrap.js"></script>
+    <script>
+   $("tr.myTable").click(function() {
+    var tableData = $(this).children("td").map(function() {
+        return $(this).text();
+    }).get();
+  	window.open('formato.php?datos='+tableData,'_ blank','');
+});
+    </script>
 </body>
 </html>
