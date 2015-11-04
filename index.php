@@ -64,7 +64,8 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="alert alert-success">
-                        Excel de Facturas <input type="file" />
+                        <button class="btn btn-primary" onclick="showFacturas('')">Formato 1</button>
+                        <button class="btn btn-danger" onclick="showFacturas('2')">Formato 2</button>
                     </div>
                 </div>
 
@@ -159,11 +160,14 @@ if (($fichero = fopen("facturas.csv", "r")) !== FALSE) {
     <!-- BOOTSTRAP SCRIPTS  -->
     <script src="assets/js/bootstrap.js"></script>
     <script>
+    function showFacturas(tipo){
+    	    	
+  	window.open('formato'+tipo+'.php','_ blank','');
+    }
    $("tr.myTable").click(function() {
     var tableData = $(this).children("td").map(function() {
         return $(this).text();
     }).get();
-  	window.open('formato.php?datos='+tableData,'_ blank','');
 });
     </script>
 </body>

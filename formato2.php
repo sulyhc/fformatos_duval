@@ -4,7 +4,6 @@ header('Content-type: application/pdf');
 require ('fpdf/fpdf.php');
 include("Letras.php");
 
-$cants = explode(',', $_GET['datos']);
 
 class PDF extends FPDF {
 	
@@ -73,8 +72,8 @@ class PDF extends FPDF {
 		//Letra color blanco
 		foreach ($cabecera as $fila) {
 			$wd = 30;
-			if ($fila == "#") {
-				$wd = 10;
+			if ($fila == "PRECIO UNITARIO") {
+				$wd = 35;
 			} elseif ($fila == "CONCEPTO") {
 				$wd = 60;
 			}
@@ -190,7 +189,7 @@ $pdf = new PDF();
 
             				$i = 1;
 							$rep = array("$",",");
-if (($fichero = fopen("facturas.csv", "r")) !== FALSE) {
+if (($fichero = fopen("facturasE.csv", "r")) !== FALSE) {
     while (($datos = fgetcsv($fichero, 0)) !== FALSE) {
         if($datos[1]!='' && $datos[1]!= "FECHA"){
         	
@@ -198,18 +197,16 @@ if (($fichero = fopen("facturas.csv", "r")) !== FALSE) {
         	$totl = $iva + floatval(str_replace($rep, "", $datos[7]));
 			$iva = number_format($iva,2);
 $pdf -> AddPage();
-$pdf -> SetFont('Arial', 'B', 16);
-$pdf -> Cell(80, 10);
-$pdf -> Cell(80, 10, "FACTURA");
-$pdf -> SetFont('Arial', 'B', 14);
-$pdf -> Cell(20, 10, "NO: ".$datos[2]);
+$pdf -> SetFont('Arial', 'I', 10);
+$pdf -> Cell(150, 10);
+$pdf -> Cell(40, 10, "FACTURA ".$datos[2],1,0,"C");
 $pdf -> Ln();
 $pdf -> SetFont('Arial', '', 10);
-$pdf -> Cell(30, 20);
-$pdf -> Cell(40, 20, "REGIMEN FISCAL:REGIMEN INTERMEDIO");
-$pdf->Ln();
+$pdf->SetXY($pdf->GetX(), $pdf->GetY());
+$pdf -> SetFont('Arial', 'B', 9);
+$pdf->MultiCell(100,5,"EPIFANIA JACOME XACO\nR.F.C.:  JAXE-321025-J56\nCALLE VERACRUZ No. 30-A COL. STA. LETICIA\nFORTIN, VER.  C.P. 94470\nREGIMEN FISCAL:REGIMEN INTERMEDIO");
+$pdf->Ln();/*
 $pdf->Cell(30,10);
-$pdf -> SetFont('Arial', 'B', 14);
 $pdf->Cell(90,5,"JULIA HERNANDEZ VIRGEN");
 $pdf -> SetFont('Arial', '', 12);
 $pdf->Cell(40,5,"R.F.C.: HEVJ-720730-1D4");
@@ -225,55 +222,62 @@ $pdf->Cell(40,5);
 $pdf->Cell(50,5,"FORTIN, VER.  C.P. 94470");
 $pdf->Ln();
 $pdf->Ln();
-$pdf->Ln();
-$pdf -> SetFont('Arial', '', 10);
-$pdf->Cell(100,5,"FORTIN, VER., A: ".$datos[1]);
-$pdf->Cell(50,5,"RFC CLIENTE: DIO991016QY5");
-$pdf->Ln();
-$pdf->Cell(100,5,"CLIENTE: DIORI S.A. DE C.V.");
-$pdf->Ln();
+$pdf->Ln();*/
+$pdf -> SetFont('Arial', 'I', 8);
+$pdf->SetXY($pdf->GetX()+80, $pdf->GetY());
+$clted = "FORTIN, VER. A ".$datos['1']."\n"."CLIENTE: DIORI S.A. DE C.V.\nRFC: DIO991016QY5\nDOMICILIO: CALLE SUR 4 # 225 ALTOS COL. CENTRO C.P. 94300 ORIZABA VER.";
+$pdf->MultiCell(100, 5, $clted,1);
+//$pdf->Cell(100,5,"FORTIN, VER., A: ".$datos[1]);
+//$pdf->Cell(50,5,"RFC CLIENTE: DIO991016QY5");
+//$pdf->Ln();
+//$pdf->Cell(100,5,"CLIENTE: DIORI S.A. DE C.V.");
+//$pdf->Ln();
+/*
 $pdf->Cell(150,5,"DOMICILIO: CALLE SUR 4 # 225 ALTOS COL. CENTRO C.P. 94300 ORIZABA VER.");
 $pdf->Ln();
 $pdf->Ln();
-$pdf->Ln();
-$header = array("CANTIDAD", "U. MEDIDA", "CONCEPTO", "P.U.", "TOTAL");
+$pdf->Ln();*/
+$header = array("CANTIDAD", "UNIDAD", "CONCEPTO", "PRECIO UNITARIO", "TOTAL");
 $pdf->tablaHorizontal($header, null);
 $pdf->datosHorizontal(1, $datos[3], $datos[4], $datos[5], $datos[6], $datos[7]);
 $pdf->SetXY(20, 200);
 $pdf->Cell(140,5,"METODO DE PAGO: EFECTIVO");
-$pdf->Cell(50,5,"IMPORTE:".$datos[7]);
+$pdf->Cell(20,5,"IMPORTE:",1);
+$pdf->Cell(20,5,$datos[7],1);
 $pdf->Ln();
 $pdf->Cell(10);
 $le = new EnLetras();
 $v = str_replace(",", "", $datos[7]);
 
-$pdf->Cell(148,5,"Cantidad en Letra: ".$le->ValorEnLetras($totl, "pesos"));
-$pdf->Cell(50, 5,"I.V.A. $".$iva);
+$pdf->Cell(140,5,"Cantidad en Letra: ".$le->ValorEnLetras($totl, "pesos"));
+$pdf->Cell(20, 5,"I.V.A.",1);
+$pdf->Cell(20,5,"$".$iva,1);
 $pdf->Ln();
-$pdf->Cell(154);
-$pdf->Cell(50, 5,"TOTAL: $".number_format($totl,2));
+$pdf->Cell(150,5);
+$pdf->Cell(20, 5,"TOTAL",1);
+$pdf->Cell(20,5,"$".number_format($totl,2),1);
 $pdf->ln();
 $pdf->ln();
 $pdf->ln();
-$img = "julia.png";
-$pdf->Cell(30,40,$pdf->Image($img,$pdf->GetX(), $pdf->GetY(),25,25));
-$pdf->SetXY($pdf->GetX(), $pdf->GetY());
-$pdf -> SetFont('Arial', 'B', 5);
-$pdf->MultiCell(70,3,utf8_decode("Vigencia:  2 Años a partir de la fecha de aprobación de la asignación de folios, la cual es del 19 de Marzo de 2013. Vence el 19 de Marzo de 2015. No. de Aprobación: 24848803 Cantidad  500 del 1 al 500."));
+$img = "epifania.png";
+$pdf->Cell(30,40,$pdf->Image($img,$pdf->GetX(), $pdf->GetY(),30,30));
+$pdf->SetXY($pdf->GetX()+20, $pdf->GetY());
+$pdf -> SetFont('Arial', 'I', 7);
+$pdf->MultiCell(100,4,utf8_decode("Vigencia:  2 Años a partir de la fecha de aprobación de la asignación de folios, la cual es del 28 de Diciembre de 2012. Vence el 27 de Diciembre de 2014. No. de Aprobación: 24437486 Cantidad  200 del 1 al 200."));
 $pdf->Ln();
-$pdf->Cell(30);
-$pdf -> SetFont('Arial', 'B', 6);
+$pdf->Cell(70);
+$pdf -> SetFont('Arial', 'B', 10);
 $pdf->Cell(40,5,"Efectos Fiscales al pago.");
 $pdf->Ln();
-$pdf->Cell(30);
+$pdf->Cell(70);
 $pdf->Cell(40,5,utf8_decode("Pago en una sola exhibición"));
 $pdf->Ln();
 $pdf->Ln();
 $pdf->Ln();
 $pdf -> SetFont('Arial', 'B', 8);
 $pdf->Cell(40);
-$pdf->SetXY($pdf->GetX(), $pdf->GetY());
-$pdf->MultiCell(100,5,utf8_decode("La reproducción apócrifa de este comprobante, constituye un delito en los términos de las disposiciones fiscales."));
+$pdf->SetXY(20, $pdf->GetY());
+$pdf->MultiCell(170,5,utf8_decode("La reproducción apócrifa de este comprobante, constituye un delito en los términos de las disposiciones fiscales."));
 
 
 }}}
